@@ -263,9 +263,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "region": {
-            "value": "[resourceGroup().location]"
-          },
           "virtualNetworkName": {
             "value": "[parameters('virtualNetworkName')]"
           },
