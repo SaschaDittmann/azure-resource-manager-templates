@@ -30,9 +30,10 @@
     </None>
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
+    <None Include="jumpbox-resources-disabled.json" />
+    <None Include="jumpbox-resources-enabled.json" />
     <None Include="kafka-cluster-install.sh" />
     <None Include="metadata.json" />
-    <None Include="Temp.json" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
   <ProjectExtensions>
