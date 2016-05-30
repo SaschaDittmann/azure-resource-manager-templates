@@ -145,6 +145,17 @@
       "metadata": {
         "description": "Virtual Machine size for the Kafka nodes in the cluster"
       }
+    },
+    "jumpbox": {
+      "type": "string",
+      "defaultValue": "enabled",
+      "allowedValues": [
+        "enabled",
+        "disabled"
+      ],
+      "metadata": {
+        "description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Kafka nodes"
+      }
     }
   },
   "variables": {
@@ -154,7 +165,9 @@
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
     "zookeeperComputerNamePrefix": "zookprnode",
     "kafkaComputerNamePrefix": "kafkanode",
-    "scriptUrl": "https://raw.githubusercontent.com/SaschaDittmann/azure-resource-manager-templates/master/kafka-on-redhat/"
+    "scriptUrl": "https://raw.githubusercontent.com/SaschaDittmann/azure-resource-manager-templates/master/kafka-on-redhat/",
+    "templateUrl": "[variables('scriptUrl')]",
+    "jumpboxTemplateName": "jumpbox-resources-"
   },
   "resources": [
     {
@@ -229,6 +242,46 @@
             }
           }
         ]
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "jumpbox-resources",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('zookeeperStorageAccountName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+
+      ],
+      "tags": {
+        "displayName": "Jumpbox Deployment"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateUrl'), variables('jumpboxTemplateName'), parameters('jumpbox'), '.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "region": {
+            "value": "[resourceGroup().location]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('zookeeperStorageAccountName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          }
+        }
       }
     },
     {
