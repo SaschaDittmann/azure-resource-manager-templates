@@ -1,0 +1,54 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "zookeeperStorageAccountName": {
+      "value": "zookeeperstorage42"
+    },
+    "kafkaStorageAccountName": {
+      "value": "kafkastorage42"
+    },
+    "adminUsername": {
+      "value": "adminuser"
+    },
+    "adminPassword": {
+      "value": "azure@1234"
+    },
+    "virtualNetworkName": {
+      "value": "kafka-vnet"
+    },
+    "addressPrefix": {
+      "value": "10.0.0.0/16"
+    },
+    "subnetName": {
+      "value": "default"
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"
+    },
+    "kafkaVersion": {
+      "value": "0.9.0.1"
+    },
+    "kafkaClusterName": {
+      "value": "kafka-arm-cluster"
+    },
+    "kafkaNodeIPAddressPrefix": {
+      "value": "10.0.0.1"
+    },
+    "zookeeperNodeIPAddressPrefix": {
+      "value": "10.0.0.4"
+    },
+    "numberOfZookeeperInstances": {
+      "value": 3
+    },
+    "numberOfKafkaInstances": {
+      "value": 5
+    },
+    "zookeeperVmSize": {
+      "value": "Standard_D1"
+    },
+    "kafkaVmSize": {
+      "value": "Standard_DS3"
+    }
+  }
+}
