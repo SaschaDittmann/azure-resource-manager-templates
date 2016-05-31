@@ -187,6 +187,9 @@ install_zookeeper()
 
 	echo $((ZOOKEEPER_ID+1)) >> /var/lib/zookeeper/myid
 
+  # TODO: Configure Firewall - This is just a workaround
+  systemctl stop firewalld
+
 	zookeeper-${zooversion}/bin/zkServer.sh start
 }
 
