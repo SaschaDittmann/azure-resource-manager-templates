@@ -472,7 +472,7 @@
           "fileUris": [
             "[concat(variables('scriptUrl'), 'kafka-cluster-install.sh')]"
           ],
-          "commandToExecute": "[concat('bash kafka-cluster-install.sh -z ',' 1 ',' -j ',parameters('zookeeperVersion'),' -c ',parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'))]"
+          "commandToExecute": "[concat('bash kafka-cluster-install.sh -z ',' 1 ',' -l ',copyindex(),' -j ',parameters('zookeeperVersion'),' -c ',parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'))]"
         }
       }
     },

@@ -36,7 +36,7 @@
 help()
 {
     #TODO: Add help text here
-    echo "This script installs kafka cluster on Ubuntu"
+    echo "This script installs kafka cluster on RedHat"
     echo "Parameters:"
     echo "-k kafka version like 0.8.2.1"
     echo "-b broker id"
@@ -44,6 +44,7 @@ help()
     echo "-z zookeeper not kafka"
     echo "-i zookeeper Private IP address prefix"
     echo "-j zookeeper version"
+    echo "-l zookeeper id"
 }
 
 log()
@@ -82,11 +83,12 @@ BROKER_ID=0
 ZOOKEEPER1KAFKA0="0"
 
 ZOOKEEPER_IP_PREFIX="10.0.0.4"
+ZOOKEEPER_ID=1
 INSTANCE_COUNT=1
 ZOOKEEPER_PORT="2181"
 
 #Loop through options passed
-while getopts :k:b:z:i:j:c:p:h optname; do
+while getopts :k:b:z:i:j:l:c:p:h optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     k)  #kafka version
@@ -104,9 +106,12 @@ while getopts :k:b:z:i:j:c:p:h optname; do
     j)  #zookeeper version
       ZK_VERSION=${OPTARG}
       ;;
+    l)  #zookeeper id
+      ZOOKEEPER_ID=${OPTARG}
+      ;;
     c) # Number of instances
-	INSTANCE_COUNT=${OPTARG}
-	;;
+	    INSTANCE_COUNT=${OPTARG}
+	    ;;
     h)  #show help
       help
       exit 2
@@ -178,10 +183,9 @@ install_zookeeper()
 	echo "clientPort=2181" >> zookeeper-${zooversion}/conf/zoo.cfg
 	echo "initLimit=5" >> zookeeper-${zooversion}/conf/zoo.cfg
 	echo "syncLimit=2" >> zookeeper-${zooversion}/conf/zoo.cfg
-	# OLD Test echo "server.1=${ZOOKEEPER_IP_PREFIX}:2888:3888" >> zookeeper-${zooversion}/conf/zoo.cfg
 	$(expand_ip_range_for_server_properties "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
 
-	echo $(($1+1)) >> /var/lib/zookeeper/myid
+	echo $(ZOOKEEPER_ID+1) >> /var/lib/zookeeper/myid
 
 	zookeeper-${zooversion}/bin/zkServer.sh start
 }
@@ -217,7 +221,6 @@ install_kafka()
 	sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
 	chmod u+x /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh
 	/usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh /usr/local/kafka/kafka_${kafkaversion}-${version}/config/server.properties &
-  # /usr/local/kafka/kafka_2.10-0.9.0.1/bin/kafka-server-start.sh /usr/local/kafka/kafka_2.10-0.9.0.1/config/server.properties &
 }
 
 # Primary Install Tasks
