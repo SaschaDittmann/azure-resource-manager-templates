@@ -185,7 +185,7 @@ install_zookeeper()
 	echo "syncLimit=2" >> zookeeper-${zooversion}/conf/zoo.cfg
 	$(expand_ip_range_for_server_properties "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
 
-	echo $(ZOOKEEPER_ID+1) >> /var/lib/zookeeper/myid
+	echo $((ZOOKEEPER_ID+1)) >> /var/lib/zookeeper/myid
 
 	zookeeper-${zooversion}/bin/zkServer.sh start
 }

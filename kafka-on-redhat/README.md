@@ -36,10 +36,22 @@ Start deployment
 Check Deployment
 ----------------
 
-To access the individual Kafka nodes, you need to use the publicly accessible jumpbox VM and ssh from it into the VM instances running Kafka.
+To access the individual Kafka and Zookeeper nodes, you need to use the publicly accessible jumpbox VM and ssh from it into the VM instances running Kafka or Zookeeper.
 
 To get started connect to the public ip of Jumpbox with username and password provided during deployment.
-From the jumpbox connect to any of the Kafka brokers eg: ssh 10.0.0.10 ,ssh 10.0.0.11, etc.
+
+From the jumpbox connect to any of the Zookeeper nodes, e.g. ssh 10.0.0.40 ,ssh 10.0.0.41, etc.
+Run this command to check that kafka process is running ok: 
+
+	ps -ef | grep zookeeper 
+
+After that, you can connect to the Zookeeper cluster running:
+
+	cd /var/lib/zookeeper/zookeeper-3.4.8/
+
+    bin/zkCli.sh -server 127.0.0.1:2181
+
+From the jumpbox connect to any of the Kafka brokers, e.g. ssh 10.0.0.10 ,ssh 10.0.0.11, etc.
 Run this command to check that kafka process is running ok: 
 
 	ps -ef | grep kafka 
