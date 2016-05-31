@@ -67,7 +67,7 @@ fi
 grep -q "${HOSTNAME}" /etc/hosts
 if [ $? -eq $SUCCESS ];
 then
-  echo "${HOSTNAME}found in /etc/hosts"
+  echo "${HOSTNAME} found in /etc/hosts"
 else
   echo "${HOSTNAME} not found in /etc/hosts"
   # Append it to the hsots file if not there
@@ -124,20 +124,14 @@ install_java()
 {
     log "Installing Java"
     
-    #add-apt-repository -y ppa:webupd8team/java
-    #apt-get -y update 
-    #echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
-    #echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
-    #apt-get -y install oracle-java7-installer
-
     # redhat java install
     cd /temp
     wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm"
     wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jre-8u45-linux-x64.rpm"
+    
     #Install packages
     rpm -Uvh jdk-8u45-linux-x64.rpm
     rpm -Uvh jre-8u45-linux-x64.rpm
-
 }
 
 # Expand a list of successive IP range defined by a starting address prefix (e.g. 10.0.0.1) and the number of machines in the range
@@ -147,7 +141,7 @@ expand_ip_range_for_server_properties() {
     IFS='-' read -a HOST_IPS <<< "$1"
     for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
     do
-        echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg       
+        echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-${ZK_VERSION}/conf/zoo.cfg       
     done
 }
 
@@ -173,8 +167,8 @@ install_zookeeper()
 	mkdir -p /var/lib/zookeeper
 	cd /var/lib/zookeeper
 	zooversion=${ZK_VERSION}
- echo ${zooversion}
-        wget "http://mirrors.ukfast.co.uk/sites/ftp.apache.org/zookeeper/stable/zookeeper-${zooversion}.tar.gz"
+  echo ${zooversion}
+  wget "http://mirrors.ukfast.co.uk/sites/ftp.apache.org/zookeeper/stable/zookeeper-${zooversion}.tar.gz"
 	tar -xvf "zookeeper-${zooversion}.tar.gz"
 
 	touch zookeeper-${zooversion}/conf/zoo.cfg
