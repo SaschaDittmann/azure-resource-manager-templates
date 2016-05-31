@@ -455,7 +455,7 @@
       "apiVersion": "2015-06-15",
       "location": "[resourceGroup().location]",
       "copy": {
-        "name": "virtualMachineExtensionsLoop",
+        "name": "virtualMachineZookeeperExtensionsLoop",
         "count": "[parameters('numberOfZookeeperInstances')]"
       },
       "dependsOn": [
@@ -482,11 +482,12 @@
       "apiVersion": "2015-05-01-preview",
       "location": "[resourceGroup().location]",
       "copy": {
-        "name": "virtualMachineExtensionsLoop",
+        "name": "virtualMachineKafkaExtensionsLoop",
         "count": "[parameters('numberOfKafkaInstances')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', 'kafka', copyindex(), '-vm')]"
+        "[concat('Microsoft.Compute/virtualMachines/', 'kafka', copyindex(), '-vm')]",
+        "virtualMachineZookeeperExtensionsLoop"
       ],
       "tags": {
         "displayName": "VM Extension (Kafka)"

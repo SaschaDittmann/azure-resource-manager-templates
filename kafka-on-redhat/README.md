@@ -13,8 +13,8 @@ Kafka is designed to allow a single cluster to serve as the central data backbon
 
 Kafka has a modern cluster-centric design that offers strong durability and fault-tolerance guarantees.
 
-This template deploys a Kafka cluster on the Ubuntu virtual machines. This template also provisions a storage account, virtual network, availability sets, public IP addresses and network interfaces required by the installation.
-The template also creates 1 publicly accessible VM acting as a "jumpbox" and allowing to ssh into the Kafka nodes for diagnostics or troubleshooting purposes.
+This template deploys a Kafka cluster on the RedHat virtual machines. This template also provisions a storage account, virtual network, availability sets, public IP addresses and network interfaces required by the installation.
+The template might also creates 1 publicly accessible VM acting as a "jumpbox" and allowing to ssh into the Kafka nodes for diagnostics or troubleshooting purposes, if not disabled.
 
 How to Run the scripts
 ----------------------
@@ -40,20 +40,23 @@ To access the individual Kafka nodes, you need to use the publicly accessible ju
 
 To get started connect to the public ip of Jumpbox with username and password provided during deployment.
 From the jumpbox connect to any of the Kafka brokers eg: ssh 10.0.0.10 ,ssh 10.0.0.11, etc.
-Run the command ps-ef|grep kafka to check that kafka process is running ok.
-You can run the kafka commands like this:
+Run this command to check that kafka process is running ok: 
 
-cd /usr/local/kafka/kafka_2.10-0.8.2.1/
+	ps -ef | grep kafka 
 
-bin/kafka-topics.sh --create --zookeeper 10.0.0.40:2181  --replication-factor 2 --partitions 1 --topic my-replicated-topic1
+After that, you can run the kafka commands:
 
-bin/kafka-topics.sh --describe --zookeeper 10.0.0.40:2181  --topic my-replicated-topic1
+	cd /usr/local/kafka/kafka_2.10-0.8.2.1/
+
+	bin/kafka-topics.sh --create --zookeeper 10.0.0.40:2181  --replication-factor 2 --partitions 1 --topic my-replicated-topic1
+
+	bin/kafka-topics.sh --describe --zookeeper 10.0.0.40:2181  --topic my-replicated-topic1
 
 Topology
 --------
 
 The deployment topology is comprised of Kafka Brokers and Zookeeper nodes running in the cluster mode.
-Kafka version 0.8.2.1 is the default version and can be changed to any pre-built binaries avaiable on Kafka repo.
+Kafka version 0.10.0.0 is the default version and can be changed to any pre-built binaries avaiable on Kafka repo.
 A static IP address will be assigned to each Kafka node in order to work around the current limitation of not being able to dynamically compose a list of IP addresses from within the template (by default, the first node will be assigned the private IP of 10.0.0.10, the second node - 10.0.0.11, and so on)
 A static IP address will be assigned to each Zookeeper node in order to work around the current limitation of not being able to dynamically compose a list of IP addresses from within the template (by default, the first node will be assigned the private IP of 10.0.0.40, the second node - 10.0.0.41, and so on)
 
