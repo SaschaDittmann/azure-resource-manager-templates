@@ -159,6 +159,8 @@ expand_ip_range() {
 
   for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
   do
+    HOST="${HOST_IPS[0]}${n}:${ZOOKEEPER_PORT}"
+    EXPAND_STATICIP_RANGE_RESULTS+=($HOST)
   done
 
   echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
