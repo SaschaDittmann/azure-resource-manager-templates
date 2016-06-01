@@ -169,23 +169,23 @@ expand_ip_range() {
 # Install Zookeeper - can expose zookeeper version
 install_zookeeper()
 {
-	mkdir -p /var/lib/zookeeper
-	cd /var/lib/zookeeper
-	zooversion=${ZK_VERSION}
+  mkdir -p /var/lib/zookeeper
+  cd /var/lib/zookeeper
+  zooversion=${ZK_VERSION}
   echo ${zooversion}
   wget "http://mirrors.ukfast.co.uk/sites/ftp.apache.org/zookeeper/stable/zookeeper-${zooversion}.tar.gz"
-	tar -xvf "zookeeper-${zooversion}.tar.gz"
+  tar -xvf "zookeeper-${zooversion}.tar.gz"
 
-	touch zookeeper-${zooversion}/conf/zoo.cfg
+  touch zookeeper-${zooversion}/conf/zoo.cfg
 
-	echo "tickTime=2000" >> zookeeper-${zooversion}/conf/zoo.cfg
-	echo "dataDir=/var/lib/zookeeper" >> zookeeper-${zooversion}/conf/zoo.cfg
-	echo "clientPort=2181" >> zookeeper-${zooversion}/conf/zoo.cfg
-	echo "initLimit=5" >> zookeeper-${zooversion}/conf/zoo.cfg
-	echo "syncLimit=2" >> zookeeper-${zooversion}/conf/zoo.cfg
-	$(expand_ip_range_for_server_properties "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
+  echo "tickTime=2000" >> zookeeper-${zooversion}/conf/zoo.cfg
+  echo "dataDir=/var/lib/zookeeper" >> zookeeper-${zooversion}/conf/zoo.cfg
+  echo "clientPort=2181" >> zookeeper-${zooversion}/conf/zoo.cfg
+  echo "initLimit=5" >> zookeeper-${zooversion}/conf/zoo.cfg
+  echo "syncLimit=2" >> zookeeper-${zooversion}/conf/zoo.cfg
+  $(expand_ip_range_for_server_properties "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
 
-	echo $((ZOOKEEPER_ID+1)) >> /var/lib/zookeeper/myid
+  echo $((ZOOKEEPER_ID+1)) >> /var/lib/zookeeper/myid
 
   # set active firewall setting
   firewall-cmd --zone=public --add-port=2181/tcp
@@ -195,39 +195,39 @@ install_zookeeper()
   firewall-cmd --zone=public --add-port=2181/tcp --permanent
   firewall-cmd --zone=public --add-port=2888-3888/tcp --permanent
 
-	zookeeper-${zooversion}/bin/zkServer.sh start
+  zookeeper-${zooversion}/bin/zkServer.sh start
 }
 
 # Install kafka
 install_kafka()
 {
-	cd /usr/local
-	name=kafka
-	version=${KF_VERSION}
-	#this Kafka version is prefix same used for all versions
-	kafkaversion=2.10
-	description="Apache Kafka is a distributed publish-subscribe messaging system."
-	url="https://kafka.apache.org/"
-	arch="all"
-	section="misc"
-	license="Apache Software License 2.0"
-	package_version="-1"
-	src_package="kafka_${kafkaversion}-${version}.tgz"
-	download_url=http://mirror.sdunix.com/apache/kafka/${version}/${src_package} 
+  cd /usr/local
+  name=kafka
+  version=${KF_VERSION}
+  #this Kafka version is prefix same used for all versions
+  kafkaversion=2.10
+  description="Apache Kafka is a distributed publish-subscribe messaging system."
+  url="https://kafka.apache.org/"
+  arch="all"
+  section="misc"
+  license="Apache Software License 2.0"
+  package_version="-1"
+  src_package="kafka_${kafkaversion}-${version}.tgz"
+  download_url=http://mirror.sdunix.com/apache/kafka/${version}/${src_package}
+  
+  rm -rf kafka
+  mkdir -p kafka
+  cd kafka
+  #_ MAIN _#
+  if [[ ! -f "${src_package}" ]]; then
+    wget ${download_url}
+  fi
+  tar zxf ${src_package}
+  cd kafka_${kafkaversion}-${version}
 
-	rm -rf kafka
-	mkdir -p kafka
-	cd kafka
-	#_ MAIN _#
-	if [[ ! -f "${src_package}" ]]; then
-	  wget ${download_url}
-	fi
-	tar zxf ${src_package}
-	cd kafka_${kafkaversion}-${version}
-	
-	sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties 
-	sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
-	chmod u+x /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh
+  sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties 
+  sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
+  chmod u+x /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh
 
   # set active firewall setting
   firewall-cmd --zone=public --add-port=9091-9093/tcp
@@ -235,7 +235,7 @@ install_kafka()
   # set permanent firewall setting
   firewall-cmd --zone=public --add-port=9091-9093/tcp --permanent
 
-	/usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh /usr/local/kafka/kafka_${kafkaversion}-${version}/config/server.properties &
+  /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh /usr/local/kafka/kafka_${kafkaversion}-${version}/config/server.properties &
 }
 
 # Primary Install Tasks
