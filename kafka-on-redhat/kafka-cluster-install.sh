@@ -21,7 +21,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-# Author: Cognosys Technologies
+# Author: Sascha Dittmann (based on the script from Cognosys Technologies for Ubuntu)
  
 ### 
 ### Warning! This script partitions and formats disk information be careful where you run it
@@ -35,32 +35,32 @@
 
 help()
 {
-    #TODO: Add help text here
-    echo "This script installs kafka cluster on RedHat"
-    echo "Parameters:"
-    echo "-k kafka version like 0.8.2.1"
-    echo "-b broker id"
-    echo "-h view this help content"
-    echo "-z zookeeper not kafka"
-    echo "-i zookeeper Private IP address prefix"
-    echo "-j zookeeper version"
-    echo "-l zookeeper id"
+  #TODO: Add help text here
+  echo "This script installs kafka cluster on RedHat"
+  echo "Parameters:"
+  echo "-k kafka version like 0.8.2.1"
+  echo "-b broker id"
+  echo "-h view this help content"
+  echo "-z zookeeper not kafka"
+  echo "-i zookeeper Private IP address prefix"
+  echo "-j zookeeper version"
+  echo "-l zookeeper id"
 }
 
 log()
 {
-	# If you want to enable this logging add a un-comment the line below and add your account key 
-    	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
-	echo "$1"
+  # If you want to enable this logging add a un-comment the line below and add your account key 
+  #curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
+  echo "$1"
 }
 
 log "Begin execution of kafka script extension on ${HOSTNAME}"
 
 if [ "${UID}" -ne 0 ];
 then
-    log "Script executed without root permissions"
-    echo "You must be root to run this program." >&2
-    exit 3
+  log "Script executed without root permissions"
+  echo "You must be root to run this program." >&2
+  exit 3
 fi
 
 # TEMP FIX - Re-evaluate and remove when possible
@@ -127,43 +127,41 @@ done
 # Install Oracle Java
 install_java()
 {
-    log "Installing Java"
-    
-    # redhat java install
-    cd /temp
-    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm"
-    wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jre-8u45-linux-x64.rpm"
-    
-    #Install packages
-    rpm -Uvh jdk-8u45-linux-x64.rpm
-    rpm -Uvh jre-8u45-linux-x64.rpm
+  log "Installing Java"
+
+  # redhat java install
+  cd /temp
+  wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jdk-8u45-linux-x64.rpm"
+  wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u45-b14/jre-8u45-linux-x64.rpm"
+
+  #Install packages
+  rpm -Uvh jdk-8u45-linux-x64.rpm
+  rpm -Uvh jre-8u45-linux-x64.rpm
 }
 
 # Expand a list of successive IP range defined by a starting address prefix (e.g. 10.0.0.1) and the number of machines in the range
 # 10.0.0.1-3 would be converted to "10.0.0.10 10.0.0.11 10.0.0.12"
 
 expand_ip_range_for_server_properties() {
-    IFS='-' read -a HOST_IPS <<< "$1"
-    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
-    do
-        echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-${ZK_VERSION}/conf/zoo.cfg       
-    done
+  IFS='-' read -a HOST_IPS <<< "$1"
+  for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+  do
+    echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-${ZK_VERSION}/conf/zoo.cfg       
+  done
 }
 
 function join { local IFS="$1"; shift; echo "$*"; }
 
 expand_ip_range() {
-    IFS='-' read -a HOST_IPS <<< "$1"
+  IFS='-' read -a HOST_IPS <<< "$1"
 
-    declare -a EXPAND_STATICIP_RANGE_RESULTS=()
+  declare -a EXPAND_STATICIP_RANGE_RESULTS=()
 
-    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
-    do
-        HOST="${HOST_IPS[0]}${n}:${ZOOKEEPER_PORT}"
-                EXPAND_STATICIP_RANGE_RESULTS+=($HOST)
-    done
+  for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+  do
+  done
 
-    echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
+  echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
 }
 
 # Install Zookeeper - can expose zookeeper version
@@ -259,4 +257,3 @@ else
 	#-----------------------
 	install_kafka
 fi
-
