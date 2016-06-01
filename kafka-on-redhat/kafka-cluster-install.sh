@@ -228,6 +228,13 @@ install_kafka()
 	sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties 
 	sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
 	chmod u+x /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh
+
+  # set active firewall setting
+  firewall-cmd --zone=public --add-port=9091-9093/tcp
+
+  # set permanent firewall setting
+  firewall-cmd --zone=public --add-port=9091-9093/tcp --permanent
+
 	/usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh /usr/local/kafka/kafka_${kafkaversion}-${version}/config/server.properties &
 }
 

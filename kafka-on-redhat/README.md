@@ -64,6 +64,10 @@ After that, you can run the kafka commands:
 
 	bin/kafka-topics.sh --describe --zookeeper 10.0.0.40:2181  --topic my-replicated-topic1
 
+	bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-replicated-topic1
+	
+	bin/kafka-console-consumer.sh --zookeeper 10.0.0.40:2181 --topic my-replicated-topic1 --from-beginning
+
 Topology
 --------
 
