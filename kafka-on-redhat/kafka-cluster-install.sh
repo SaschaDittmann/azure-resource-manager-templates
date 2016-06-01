@@ -187,8 +187,13 @@ install_zookeeper()
 
 	echo $((ZOOKEEPER_ID+1)) >> /var/lib/zookeeper/myid
 
-  # TODO: Configure Firewall - This is just a workaround
-  systemctl stop firewalld
+  # set active firewall setting
+  firewall-cmd --zone=public --add-port=2181/tcp
+  firewall-cmd --zone=public --add-port=2888-3888/tcp
+
+  # set permanent firewall setting
+  firewall-cmd --zone=public --add-port=2181/tcp --permanent
+  firewall-cmd --zone=public --add-port=2888-3888/tcp --permanent
 
 	zookeeper-${zooversion}/bin/zkServer.sh start
 }

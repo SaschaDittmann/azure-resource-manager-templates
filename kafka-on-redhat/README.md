@@ -58,7 +58,7 @@ Run this command to check that kafka process is running ok:
 
 After that, you can run the kafka commands:
 
-	cd /usr/local/kafka/kafka_2.10-0.8.2.1/
+	cd /usr/local/kafka/kafka_2.10-0.10.0.0/
 
 	bin/kafka-topics.sh --create --zookeeper 10.0.0.40:2181  --replication-factor 2 --partitions 1 --topic my-replicated-topic1
 
