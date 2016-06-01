@@ -213,7 +213,8 @@ install_kafka()
   license="Apache Software License 2.0"
   package_version="-1"
   src_package="kafka_${kafkaversion}-${version}.tgz"
-  download_url=http://mirror.sdunix.com/apache/kafka/${version}/${src_package}
+  download_url=http://mirrors.ukfast.co.uk/sites/ftp.apache.org/kafka/${version}/${src_package} 
+  #download_url=http://mirror.sdunix.com/apache/kafka/${version}/${src_package}
   
   rm -rf kafka
   mkdir -p kafka
