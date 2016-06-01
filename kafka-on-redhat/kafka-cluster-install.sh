@@ -40,6 +40,7 @@ help()
   echo "Parameters:"
   echo "-k kafka version like 0.8.2.1"
   echo "-b broker id"
+  echo "-p broker Private IP address prefix"
   echo "-h view this help content"
   echo "-z zookeeper not kafka"
   echo "-i zookeeper Private IP address prefix"
@@ -80,6 +81,7 @@ fi
 KF_VERSION="0.8.2.1"
 ZK_VERSION="3.4.8"
 BROKER_ID=0
+BROKER_IP_PREFIX="10.0.0.1"
 ZOOKEEPER1KAFKA0="0"
 
 ZOOKEEPER_IP_PREFIX="10.0.0.4"
@@ -112,6 +114,9 @@ while getopts :k:b:z:i:j:l:c:p:h optname; do
     c) # Number of instances
 	    INSTANCE_COUNT=${OPTARG}
 	    ;;
+    p)  #broker Private IP address prefix
+      BROKER_IP_PREFIX=${OPTARG}
+      ;;
     h)  #show help
       help
       exit 2
@@ -229,8 +234,10 @@ install_kafka()
   tar zxf ${src_package}
   cd kafka_${kafkaversion}-${version}
 
-  sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties 
+  sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties
   sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
+  sed -r -i "s/#advertised.host.name/advertised.host.name/g" config/server.properties
+  sed -r -i "s/(advertised.host.name)=(.*)/\1=${BROKER_IP_PREFIX}${BROKER_ID}/g" config/server.properties
   chmod u+x /usr/local/kafka/kafka_${kafkaversion}-${version}/bin/kafka-server-start.sh
 
   # set active firewall setting
