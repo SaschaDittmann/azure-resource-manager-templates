@@ -159,11 +159,13 @@ log "Updating firewall settings"
 # set active firewall setting
 firewall-cmd --zone=public --add-port=2181/tcp
 firewall-cmd --zone=public --add-port=2888/tcp
+firewall-cmd --zone=public --add-port=3888/tcp
 firewall-cmd --zone=public --add-port=3888/udp
 
 # set permanent firewall setting
 firewall-cmd --zone=public --add-port=2181/tcp --permanent
 firewall-cmd --zone=public --add-port=2888/tcp --permanent
+firewall-cmd --zone=public --add-port=3888/tcp --permanent
 firewall-cmd --zone=public --add-port=3888/udp --permanent
 
 log "Starting Zookeeper"
