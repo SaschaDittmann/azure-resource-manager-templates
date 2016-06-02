@@ -194,15 +194,13 @@ install_zookeeper()
 
   # set active firewall setting
   firewall-cmd --zone=public --add-port=2181/tcp
-  firewall-cmd --zone=public --add-port=2181/udp
-  firewall-cmd --zone=public --add-port=2888-3888/tcp
-  firewall-cmd --zone=public --add-port=2888-3888/udp
+  firewall-cmd --zone=public --add-port=2888/tcp
+  firewall-cmd --zone=public --add-port=3888/udp
 
   # set permanent firewall setting
   firewall-cmd --zone=public --add-port=2181/tcp --permanent
-  firewall-cmd --zone=public --add-port=2181/udp --permanent
-  firewall-cmd --zone=public --add-port=2888-3888/tcp --permanent
-  firewall-cmd --zone=public --add-port=2888-3888/udp --permanent
+  firewall-cmd --zone=public --add-port=2888/tcp --permanent
+  firewall-cmd --zone=public --add-port=3888/udp --permanent
 
   zookeeper-${zooversion}/bin/zkServer.sh start
 }
