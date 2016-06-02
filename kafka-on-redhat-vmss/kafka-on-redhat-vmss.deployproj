@@ -25,12 +25,17 @@
   <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
   <!-- vertag<:>end -->
   <ItemGroup>
+    <Content Include="scalecluster.parameters.json" />
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
-    <Content Include="vmss.json" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
+    <None Include="install-kafka-cluster.sh" />
+    <None Include="install-zookeeper-cluster.sh" />
+    <None Include="jumpbox-resources-disabled.json" />
+    <None Include="jumpbox-resources-enabled.json" />
+    <None Include="scalecluster.json" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
