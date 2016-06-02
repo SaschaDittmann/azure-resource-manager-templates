@@ -470,9 +470,9 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": [
-            "[concat(variables('scriptUrl'), 'kafka-cluster-install.sh')]"
+            "[concat(variables('scriptUrl'), 'install-zookeeper-cluster.sh')]"
           ],
-          "commandToExecute": "[concat('bash kafka-cluster-install.sh -z ',' 1 ',' -l ',copyindex(),' -j ',parameters('zookeeperVersion'),' -c ',parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'))]"
+          "commandToExecute": "[concat('bash install-zookeeper-cluster.sh -z ',copyindex(),' -v ',parameters('zookeeperVersion'),' -c ',parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'))]"
         }
       }
     },
@@ -498,9 +498,9 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": [
-            "[concat(variables('scriptUrl'), 'kafka-cluster-install.sh')]"
+            "[concat(variables('scriptUrl'), 'install-kafka-cluster.sh')]"
           ],
-          "commandToExecute": "[concat('bash kafka-cluster-install.sh -b ',copyindex(),' -k ',parameters('kafkaVersion'),' -c ', parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'),' -p ', parameters('kafkaNodeIPAddressPrefix'))]"
+          "commandToExecute": "[concat('bash install-kafka-cluster.sh -b ',copyindex(),' -v ',parameters('kafkaVersion'),' -i ', parameters('kafkaNodeIPAddressPrefix'),' -c ', parameters('numberOfZookeeperInstances'),' -z ', parameters('zookeeperNodeIPAddressPrefix'))]"
         }
       }
     }
