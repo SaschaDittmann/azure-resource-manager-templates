@@ -10,10 +10,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,8 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # Author: Sascha Dittmann (based on the script from Cognosys Technologies for Ubuntu)
- 
-### 
+
+###
 ### Warning! This script partitions and formats disk information be careful where you run it
 ###          This script is currently under development
 ###          This script is not currently idempotent and only works for provisioning at the moment
@@ -42,7 +42,7 @@ help()
 
 log()
 {
-  # If you want to enable this logging add a un-comment the line below and add your account key 
+  # If you want to enable this logging add a un-comment the line below and add your account key
   #curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
   echo "$1"
 }
@@ -89,8 +89,8 @@ while getopts :v:z:i:c:h optname; do
       ZOOKEEPER_IP_PREFIX=${OPTARG}
       ;;
     c) # number of zookeeper instances
-	    ZOOKEEPER_INSTANCE_COUNT=${OPTARG}
-	    ;;
+        ZOOKEEPER_INSTANCE_COUNT=${OPTARG}
+        ;;
     h)  #show help
       help
       exit 2
@@ -109,7 +109,7 @@ expand_ip_range_for_server_properties() {
   IFS='-' read -a HOST_IPS <<< "$1"
   for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
   do
-    echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-${ZOOKEEPER_VERSION}/conf/zoo.cfg       
+    echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-${ZOOKEEPER_VERSION}/conf/zoo.cfg
   done
 }
 

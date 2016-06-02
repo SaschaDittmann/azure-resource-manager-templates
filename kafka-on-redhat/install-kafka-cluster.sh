@@ -10,10 +10,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,8 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 # Author: Sascha Dittmann (based on the script from Cognosys Technologies for Ubuntu)
- 
-### 
+
+###
 ### Warning! This script partitions and formats disk information be careful where you run it
 ###          This script is currently under development
 ###          This script is not currently idempotent and only works for provisioning at the moment
@@ -43,7 +43,7 @@ help()
 
 log()
 {
-  # If you want to enable this logging add a un-comment the line below and add your account key 
+  # If you want to enable this logging add a un-comment the line below and add your account key
   #curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
   echo "$1"
 }
@@ -98,8 +98,8 @@ while getopts :v:b:i:z:p:c:h optname; do
       ZOOKEEPER_PORT=${OPTARG}
       ;;
     c) # number of Zookeeper instances
-	    ZOOKEEPER_INSTANCE_COUNT=${OPTARG}
-	    ;;
+        ZOOKEEPER_INSTANCE_COUNT=${OPTARG}
+        ;;
     h)  #show help
       help
       exit 2
@@ -156,7 +156,7 @@ section="misc"
 license="Apache Software License 2.0"
 package_version="-1"
 src_package="kafka_${kafkaversion}-${version}.tgz"
-download_url=http://mirrors.ukfast.co.uk/sites/ftp.apache.org/kafka/${version}/${src_package} 
+download_url=http://mirrors.ukfast.co.uk/sites/ftp.apache.org/kafka/${version}/${src_package}
 
 rm -rf kafka
 mkdir -p kafka
@@ -172,7 +172,7 @@ cd kafka_${kafkaversion}-${version}
 
 log "Updating server.properties"
 sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties
-sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${ZOOKEEPER_INSTANCE_COUNT}"))/g" config/server.properties 
+sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${ZOOKEEPER_INSTANCE_COUNT}"))/g" config/server.properties
 sed -r -i "s/#advertised.host.name/advertised.host.name/g" config/server.properties
 sed -r -i "s/(advertised.host.name)=(.*)/\1=${BROKER_IP_PREFIX}${BROKER_ID}/g" config/server.properties
 
