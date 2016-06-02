@@ -1,0 +1,63 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "myVNET",
+      "metadata": {
+        "Description": "The arbitrary name of the virtual network provisioned for the cluster"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "Description": "Subnet name for the virtual network that resources will be provisioned in to"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "uniquestoragejump",
+      "metadata": {
+        "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "Description": "Administrator user name used when provisioning virtual machines"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "Description": "Administrator password used when provisioning virtual machines"
+      }
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "RedHat",
+      "metadata": {
+        "description": "Image Publisher"
+      }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "RHEL",
+      "metadata": {
+        "description": "Image Offer"
+      }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "7.2",
+      "metadata": {
+        "description": "Image SKU"
+      }
+    }
+  },
+  "variables": { },
+  "resources": [ ],
+  "outputs": { }
+}
