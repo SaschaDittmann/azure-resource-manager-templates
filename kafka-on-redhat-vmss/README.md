@@ -28,11 +28,11 @@ Remember to set your Username, Password and Unique Storage Account name in azure
 
 Create a resource group:
 
-    PS C:\Users\azureuser1> New-AzureResourceGroup -Name "kafka-vmss" -Location 'WestEurope'
+    PS C:\> New-AzureResourceGroup -Name "kafka-vmss" -Location 'WestEurope'
 
 Start deployment
 
-    PS C:\Users\azureuser1> New-AzureResourceGroupDeployment -Name kafkademo-deployment -ResourceGroupName "kafka-vmss" -TemplateFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\azuredeploy.json -TemplateParameterFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\azuredeploy.parameters.json -Verbose
+    PS C:\> New-AzureResourceGroupDeployment -Name kafkademo-deployment -ResourceGroupName "kafka-vmss" -TemplateFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\azuredeploy.json -TemplateParameterFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\azuredeploy.parameters.json -Verbose
     
 Check Deployment
 ----------------
@@ -69,6 +69,26 @@ After that, you can run the kafka commands:
 	
 	bin/kafka-console-consumer.sh --zookeeper 10.0.0.40:2181 --topic my-replicated-topic1 --from-beginning
 
+Scaling Kafka
+-------------
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSaschaDittmann%2Fazure-resource-manager-templates%2Fmaster%2Fkafka-on-redhat-vmss%2Fscalecluster.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+Your able to add or remove nodes from the Kafka cluster with the help of the Virtual Machine Scale Set.
+To change the size of the Virtual Machine Scale Set, you can run the following PowerShell:
+
+    PS C:\> $vmss = Get-AzureRmVmss -ResourceGroupName "kafka-vmss" -VMScaleSetName "kafka-scaleset"
+    PS C:\> $vmss.Sku.Capacity = 10
+    PS C:\> Update-AzureRmVmss -ResourceGroupName "kafka-vmss" -Name "kafka-scaleset" -VirtualMachineScaleSet $vmss
+
+or by using the scalecluster.json ARM template
+
+    PS C:\> New-AzureResourceGroupDeployment -Name kafkademo-scale-deployment -ResourceGroupName "kafka-vmss" -TemplateFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\scalecluster.json -TemplateParameterFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\scalecluster.parameters.json -Verbose
+
+If you scale down the Kafka cluster, Zookeeper needs some time to recognise the missing nodes, but eventually updates its metadata.
+
 Topology
 --------
 
@@ -78,14 +98,3 @@ A dynamic IP address will be assigned to each Kafka node in a separate subnet na
 A static IP address will be assigned to each Zookeeper node in order to work around the current limitation of not being able to dynamically compose a list of IP addresses from within the template (by default, the first node will be assigned the private IP of 10.0.0.40, the second node - 10.0.0.41, and so on)
 
 To check deployment errors go to the new azure portal and look under Resource Group -> Last deployment -> Check Operation Details
-
-Scaling Kafka
--------------
-
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSaschaDittmann%2Fazure-resource-manager-templates%2Fmaster%2Fkafka-on-redhat-vmss%2Fscalecluster.json" target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
-</a>
-
-To change the size of the Virtual Machine Scale Set used for the kafka cluster, you can run the following PowerShell:
-
-    PS C:\Users\azureuser1> New-AzureResourceGroupDeployment -Name kafkademo-scale-deployment -ResourceGroupName "kafka-vmss" -TemplateFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\scalecluster.json -TemplateParameterFile C:\gitsrc\azure-resource-manager-templates\kafka-on-redhat-vmss\scalecluster.parameters.json -Verbose
