@@ -48,7 +48,7 @@ Run this command to check that kafka process is running ok:
 
 After that, you can connect to the Zookeeper cluster running:
 
-	cd /var/lib/zookeeper/zookeeper-3.4.8/
+	cd /var/lib/zookeeper/zookeeper-3.4.9/
 
     bin/zkCli.sh -server 127.0.0.1:2181
 
