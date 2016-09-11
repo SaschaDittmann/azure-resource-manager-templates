@@ -91,7 +91,7 @@
     },
     "zookeeperVersion": {
       "type": "string",
-      "defaultValue": "3.4.8",
+      "defaultValue": "3.4.9",
       "metadata": {
         "description": "The version of the Zookeeper package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
       }
