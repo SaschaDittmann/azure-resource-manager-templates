@@ -1,0 +1,33 @@
+﻿{
+  "$schema":"http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+  "contentVersion":"1.0.0.0",
+  "parameters": {
+    "newNumberOfKafkaInstances": {
+      "type": "int",
+      "defaultValue": 5,
+      "metadata": {
+        "description": "New number of Kafka nodes in the cluster"
+      }
+    },
+    "kafkaVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS3",
+      "metadata": {
+        "description": "Virtual Machine size for the Kafka nodes in the cluster"
+      }
+    }
+  },
+  "resources":[
+    {
+      "type":"Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion":"2016-03-30",
+      "name":"kafka-scaleset",
+      "location":"[resourceGroup().location]",
+      "sku": {
+        "name": "[parameters('kafkaVmSize')]",
+        "tier": "Standard",
+        "capacity": "[parameters('newNumberOfKafkaInstances')]"
+      }
+    }
+  ]
+}

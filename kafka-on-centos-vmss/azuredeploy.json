@@ -1,0 +1,504 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Administrator user name used when provisioning virtual machines"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Administrator password used when provisioning virtual machines"
+      }
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "OpenLogic",
+      "metadata": {
+        "description": "Image Publisher"
+      }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "CentOS",
+      "metadata": {
+        "description": "Image Offer"
+      }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "7.2",
+      "metadata": {
+        "description": "Image SKU"
+      }
+    },
+    "zookeeperStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique namespace for the Storage Account where the Virtual Machine's of the Zookeeper disks will be placed"
+      }
+    },
+    "kafkaStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique namespace for the Storage Account where the Virtual Machine's of the Kafka disks will be placed"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "kafka-vnet",
+      "metadata": {
+        "description": "The arbitrary name of the virtual network provisioned for the cluster"
+      }
+    },
+    "addressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "The network address space for the virtual network"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Subnet name for the virtual network that resources will be provisioned into by default"
+      }
+    },
+    "subnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+        "description": "Address space for the virtual network subnet"
+      }
+    },
+    "kafkaSubnetName": {
+      "type": "string",
+      "defaultValue": "kafka",
+      "metadata": {
+        "description": "Subnet name for the virtual network that kafka nodes will be provisioned into"
+      }
+    },
+    "kafkaSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Address space for the virtual network subnet that kafka nodes will be provisioned into"
+      }
+    },
+    "zookeeperVersion": {
+      "type": "string",
+      "defaultValue": "3.4.9",
+      "metadata": {
+        "description": "The version of the Zookeeper package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
+      }
+    },
+    "kafkaVersion": {
+      "type": "string",
+      "defaultValue": "0.10.0.0",
+      "allowedValues": [
+        "0.10.0.0",
+        "0.9.0.0",
+        "0.9.0.1",
+        "0.8.2.2",
+        "0.8.2.1",
+        "0.8.2.0",
+        "0.8.1.1"
+      ],
+      "metadata": {
+        "description": "The version of the Kafka package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
+      }
+    },
+    "kafkaClusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "The arbitrary name of the Kafka cluster (maps to cluster's configuration file name)"
+      }
+    },
+    "zookeeperNodeIPAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.4",
+      "metadata": {
+        "description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
+      }
+    },
+    "kafkaNodeIPAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.1",
+      "metadata": {
+        "description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
+      }
+    },
+    "numberOfZookeeperInstances": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Number of Zookeeper nodes in the cluster"
+      }
+    },
+    "numberOfKafkaInstances": {
+      "type": "int",
+      "defaultValue": 5,
+      "metadata": {
+        "description": "Number of Kafka nodes in the cluster"
+      }
+    },
+    "zookeeperVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D1",
+      "metadata": {
+        "description": "Virtual Machine size for the Zookeeper nodes in the cluster"
+      }
+    },
+    "kafkaVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS3",
+      "metadata": {
+        "description": "Virtual Machine size for the Kafka nodes in the cluster"
+      }
+    },
+    "jumpbox": {
+      "type": "string",
+      "defaultValue": "enabled",
+      "allowedValues": [
+        "enabled",
+        "disabled"
+      ],
+      "metadata": {
+        "description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Kafka nodes"
+      }
+    }
+  },
+  "variables": {
+    "platformFaultDomainCount": "2",
+    "platformUpdateDomainCount": "5",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
+    "kafkaSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('kafkaSubnetName'))]",
+    "zookeeperComputerNamePrefix": "zookprnode",
+    "kafkaComputerNamePrefix": "kafkanode",
+    "scriptUrl": "https://raw.githubusercontent.com/SaschaDittmann/azure-resource-manager-templates/master/kafka-on-centos-vmss/",
+    "templateUrl": "[variables('scriptUrl')]",
+    "jumpboxTemplateName": "jumpbox-resources-",
+    "uniqueStringArray": [
+      "[concat(parameters('kafkaStorageAccountName'), '0')]",
+      "[concat(parameters('kafkaStorageAccountName'), '1')]",
+      "[concat(parameters('kafkaStorageAccountName'), '2')]",
+      "[concat(parameters('kafkaStorageAccountName'), '3')]",
+      "[concat(parameters('kafkaStorageAccountName'), '4')]"
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('zookeeperStorageAccountName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Storage Account (Zookeeper)"
+      },
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('uniqueStringArray')[copyIndex()]]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "tags": {
+        "displayName": "Storage Accounts (Kafka)"
+      },
+      "copy": {
+        "name": "storageLoop",
+        "count": "[length(variables('uniqueStringArray'))]"
+      },
+      "properties": {
+        "accountType": "Premium_LRS"
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "zookeeper-availabilityset",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Availability Set (Zookeeper)"
+      },
+      "properties": {
+        "platformFaultDomainCount": "[variables('platformFaultDomainCount')]",
+        "platformUpdateDomainCount": "[variables('platformUpdateDomainCount')]"
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "Virtual Network"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefix')]"
+            }
+          },
+          {
+            "name": "[parameters('kafkaSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('kafkaSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "jumpbox-resources",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('zookeeperStorageAccountName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateUrl'), variables('jumpboxTemplateName'), parameters('jumpbox'), '.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('zookeeperStorageAccountName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat('zookeeper', copyindex(), '-nic')]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[parameters('numberOfZookeeperInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "tags": {
+        "displayName": "Network Interfaces (Zookeeper)"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(parameters('zookeeperNodeIPAddressPrefix'), copyindex())]",
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat('zookeeper', copyindex(), '-vm')]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "virtualZookeeperMachineLoop",
+        "count": "[parameters('numberOfZookeeperInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('zookeeperStorageAccountName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', 'zookeeper', copyindex(), '-nic')]"
+      ],
+      "tags": {
+        "displayName": "Virtual Machines (Zookeeper)"
+      },
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', 'zookeeper-availabilityset')]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('zookeeperVmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(variables('zookeeperComputerNamePrefix'), copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": false
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('https://',parameters('zookeeperStorageAccountName'),'.blob.core.windows.net/vhds/',variables('zookeeperComputerNamePrefix'), copyindex() ,'-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('zookeeper', copyindex(), '-nic'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat('zookeeper', copyindex(), '-vm/installzoo')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "virtualMachineZookeeperExtensionsLoop",
+        "count": "[parameters('numberOfZookeeperInstances')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', 'zookeeper', copyindex(), '-vm')]"
+      ],
+      "tags": {
+        "displayName": "VM Extension (Zookeeper)"
+      },
+      "properties": {
+        "publisher": "Microsoft.OSTCExtensions",
+        "type": "CustomScriptForLinux",
+        "typeHandlerVersion": "1.2",
+        "settings": {
+          "fileUris": [
+            "[concat(variables('scriptUrl'), 'install-zookeeper-cluster.sh')]"
+          ],
+          "commandToExecute": "[concat('bash install-zookeeper-cluster.sh -z ',copyindex(),' -v ',parameters('zookeeperVersion'),' -c ',parameters('numberOfZookeeperInstances'),' -i ', parameters('zookeeperNodeIPAddressPrefix'))]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "name": "kafka-scaleset",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "tags": {
+        "displayName": "VM Scale Set (Kafka)"
+      },
+      "dependsOn": [
+        "storageLoop",
+        "virtualMachineZookeeperExtensionsLoop",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "sku": {
+        "name": "[parameters('kafkaVmSize')]",
+        "tier": "Standard",
+        "capacity": "[parameters('numberOfKafkaInstances')]"
+      },
+      "properties": {
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "vhdContainers": [
+                "[concat('https://', variables('uniqueStringArray')[0], '.blob.core.windows.net/vhds')]",
+                "[concat('https://', variables('uniqueStringArray')[1], '.blob.core.windows.net/vhds')]",
+                "[concat('https://', variables('uniqueStringArray')[2], '.blob.core.windows.net/vhds')]",
+                "[concat('https://', variables('uniqueStringArray')[3], '.blob.core.windows.net/vhds')]",
+                "[concat('https://', variables('uniqueStringArray')[4], '.blob.core.windows.net/vhds')]"
+              ],
+              "name": "[concat(variables('kafkaComputerNamePrefix'),'-osdisk')]",
+              "caching": "ReadOnly",
+              "createOption": "FromImage"
+            },
+            "imageReference": {
+              "publisher": "[parameters('imagePublisher')]",
+              "offer": "[parameters('imageOffer')]",
+              "sku": "[parameters('imageSKU')]",
+              "version": "latest"
+            }
+          },
+          "osProfile": {
+            "computerNamePrefix": "[variables('kafkaComputerNamePrefix')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "kafka-nic",
+                "properties": {
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "kafka-ipconfig",
+                      "properties": {
+                        "privateIPAllocationMethod": "Dynamic",
+                        "subnet": {
+                          "id": "[variables('kafkaSubnetRef')]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "InstallKafka",
+                "properties": {
+                  "publisher": "Microsoft.OSTCExtensions",
+                  "type": "CustomScriptForLinux",
+                  "typeHandlerVersion": "1.2",
+                  "settings": {
+                    "fileUris": [
+                      "[concat(variables('scriptUrl'), 'install-kafka-cluster.sh')]"
+                    ],
+                    "commandToExecute": "[concat('bash install-kafka-cluster.sh -v ',parameters('kafkaVersion'),' -c ', parameters('numberOfZookeeperInstances'),' -z ', parameters('zookeeperNodeIPAddressPrefix'))]"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+
