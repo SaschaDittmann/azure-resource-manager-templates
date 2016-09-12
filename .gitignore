@@ -28,6 +28,8 @@ emacs-config.el
 bin/
 obj/
 Deployment.targets
+.sln
+.deployproj
 
 # custom
 *.ps1
