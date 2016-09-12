@@ -1,0 +1,54 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "zookeeperStorageAccountName": {
+      "value": "zookeeperstoragevmss"
+    },
+    "nifiStorageAccountName": {
+      "value": "nifistoragevmss"
+    },
+    "adminUsername": {
+      "value": "adminuser"
+    },
+    "adminPassword": {
+      "value": "azure@1234"
+    },
+    "virtualNetworkName": {
+      "value": "kafka-vnet"
+    },
+    "addressPrefix": {
+      "value": "10.0.0.0/16"
+    },
+    "subnetName": {
+      "value": "default"
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"
+    },
+    "nifiVersion": {
+      "value": "0.9.0.1"
+    },
+    "nifiClusterName": {
+      "value": "nifi-arm-cluster"
+    },
+    "nifiNodeIPAddressPrefix": {
+      "value": "10.0.0.1"
+    },
+    "zookeeperNodeIPAddressPrefix": {
+      "value": "10.0.0.4"
+    },
+    "numberOfZookeeperInstances": {
+      "value": 3
+    },
+    "numberOfNifiInstances": {
+      "value": 0
+    },
+    "zookeeperVmSize": {
+      "value": "Standard_D1"
+    },
+    "nifiVmSize": {
+      "value": "Standard_DS3"
+    }
+  }
+}
