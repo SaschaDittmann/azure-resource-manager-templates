@@ -12,7 +12,7 @@
       "value": "adminuser"
     },
     "adminPassword": {
-      "value": "azure@1234"
+      "value": "azure@123456"
     },
     "virtualNetworkName": {
       "value": "kafka-vnet"
