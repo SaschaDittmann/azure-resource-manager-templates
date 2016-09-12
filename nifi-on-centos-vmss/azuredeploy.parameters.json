@@ -49,6 +49,9 @@
     },
     "nifiVmSize": {
       "value": "Standard_DS3_V2"
-    }    
+    },
+    "nifiDnsName": { 
+      "value": "nifidemo"
+    }
   }
 }

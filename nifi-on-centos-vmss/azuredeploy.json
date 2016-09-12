@@ -103,6 +103,12 @@
         "description": "The version of the Nifi package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
       }
     },
+    "nifiDnsName": { 
+      "type": "string", 
+      "metadata": { 
+        "description": "The DNS name of the Nifi cluster" 
+      } 
+    }, 
     "nifiClusterName": {
       "type": "string",
       "metadata": {
@@ -401,6 +407,83 @@
       }
     },
     {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "nifi-publicip",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic", 
+        "dnsSettings": { 
+          "domainNameLabel": "[parameters('nifiDnsName')]" 
+        } 
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "nifi-lb",
+      "location": "[resourceGroup().location]",
+      "properties": {
+          "frontendIPConfigurations": [
+              {
+                  "name": "LoadBalancerFrontEnd",
+                  "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": {
+                          "id": "[resourceId('Microsoft.Network/publicIPAddresses','nifi-publicip')]"
+                      }
+                  }
+              }
+          ],
+          "backendAddressPools": [
+            { 
+              "name": "nifi-bepool"
+            } 
+          ],
+          "loadBalancingRules": [
+            {
+              "name": "nifi-web",
+              "properties": {
+                "frontendIPConfiguration": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers','nifi-lb'), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+                },
+                "frontendPort": 80,
+                "backendPort": 8080,
+                "enableFloatingIP": false,
+                "idleTimeoutInMinutes": 4,
+                "protocol": "Tcp",
+                "loadDistribution": "SourceIP",
+                "backendAddressPool": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers','nifi-lb'), '/backendAddressPools/nifi-bepool')]"
+                },
+                "probe": {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers','nifi-lb'), '/probes/nifi-probe')]"
+                }
+              }
+            }
+          ],
+          "probes": [
+            {
+              "name": "nifi-probe",
+              "properties": {
+                "protocol": "Http",
+                "port": 8080,
+                "requestPath": "/nifi",
+                "intervalInSeconds": 5,
+                "numberOfProbes": 2
+              }
+            }
+          ],
+          "inboundNatRules": [],
+          "outboundNatRules": [],
+          "inboundNatPools": []
+      },
+      "resources": [],
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', 'nifi-publicip')]"
+      ]
+    },
+    {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "name": "nifi-scaleset",
       "location": "[resourceGroup().location]",
@@ -461,7 +544,12 @@
                         "privateIPAllocationMethod": "Dynamic",
                         "subnet": {
                           "id": "[variables('nifiSubnetRef')]"
-                        }
+                        },
+                        "loadBalancerBackendAddressPools": [ 
+                          { 
+                            "id": "[concat(resourceId('Microsoft.Network/loadBalancers','nifi-lb'), '/backendAddressPools/nifi-bepool')]" 
+                          } 
+                        ] 
                       }
                     }
                   ]
@@ -492,4 +580,3 @@
     }
   ]
 }
-
