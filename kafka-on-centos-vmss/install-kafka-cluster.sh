@@ -72,8 +72,8 @@ fi
 
 #Script Parameters
 KF_VERSION="0.10.0.0"
-BROKER_ID=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/' | rev | cut -f1 -d'.' | rev)
-BROKER_IP=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1 -d'/')
+BROKER_ID=$(ip addr show eth0 | grep 'inet ' | awk '{print $2}' | cut -f1 -d'/' | rev | cut -f1 -d'.' | rev)
+BROKER_IP=$(ip addr show eth0 | grep 'inet ' | awk '{print $2}' | cut -f1 -d'/')
 ZOOKEEPER_IP_PREFIX="10.0.0.4"
 ZOOKEEPER_INSTANCE_COUNT=1
 ZOOKEEPER_PORT="2181"
