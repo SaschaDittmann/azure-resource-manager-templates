@@ -45,10 +45,10 @@
       "value": 5
     },
     "zookeeperVmSize": {
-      "value": "Standard_D1"
+      "value": "Standard_D1_V2"
     },
     "kafkaVmSize": {
-      "value": "Standard_DS3"
+      "value": "Standard_DS3_V2"
     }
   }
 }

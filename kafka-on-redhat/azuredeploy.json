@@ -134,14 +134,14 @@
     },
     "zookeeperVmSize": {
       "type": "string",
-      "defaultValue": "Standard_D1",
+      "defaultValue": "Standard_D1_V2",
       "metadata": {
         "description": "Virtual Machine size for the Zookeeper nodes in the cluster"
       }
     },
     "kafkaVmSize": {
       "type": "string",
-      "defaultValue": "Standard_DS3",
+      "defaultValue": "Standard_DS3_V2",
       "metadata": {
         "description": "Virtual Machine size for the Kafka nodes in the cluster"
       }
