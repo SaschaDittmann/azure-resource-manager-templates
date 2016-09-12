@@ -15,7 +15,7 @@
       "value": "azure@123456"
     },
     "virtualNetworkName": {
-      "value": "kafka-vnet"
+      "value": "nifi-vnet"
     },
     "addressPrefix": {
       "value": "10.0.0.0/16"
@@ -27,7 +27,7 @@
       "value": "10.0.0.0/24"
     },
     "nifiVersion": {
-      "value": "0.9.0.1"
+      "value": "1.0.0"
     },
     "nifiClusterName": {
       "value": "nifi-arm-cluster"
@@ -42,13 +42,13 @@
       "value": 3
     },
     "numberOfNifiInstances": {
-      "value": 0
+      "value": 5
     },
     "zookeeperVmSize": {
-      "value": "Standard_D1"
+      "value": "Standard_D1_V2"
     },
     "nifiVmSize": {
-      "value": "Standard_DS3"
-    }
+      "value": "Standard_DS3_V2"
+    }    
   }
 }
